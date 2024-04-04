@@ -5,12 +5,12 @@ navigator.geolocation.getCurrentPosition(position => {
   };
 
   // Calculate the Euclidean distance between the user's location and each restaurant's location
-  for (let restaurant of restaurants) {
+  restaurants.forEach(restaurant => {
     const restaurantLocation = restaurant.location.coordinates;
     const dx = userLocation.latitude - restaurantLocation[1];
     const dy = userLocation.longitude - restaurantLocation[0];
     restaurant.distance = Math.sqrt(dx * dx + dy * dy);
-  }
+  });
 
   // Sort the restaurants based on the calculated distances
   restaurants.sort((a, b) => a.distance - b.distance);
@@ -19,7 +19,7 @@ navigator.geolocation.getCurrentPosition(position => {
   const tableElement = document.querySelector('table');
 
   // Display the sorted list of restaurants
-  for (let restaurant of restaurants) {
+  restaurants.forEach(restaurant => {
     const rowElement = document.createElement('tr');
     const nameCellElement = document.createElement('td');
     const addressCellElement = document.createElement('td');
@@ -31,7 +31,7 @@ navigator.geolocation.getCurrentPosition(position => {
     rowElement.appendChild(addressCellElement);
 
     tableElement.appendChild(rowElement);
-  }
+  });
 });
 const restaurants = [
   {

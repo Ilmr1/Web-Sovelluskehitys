@@ -29,7 +29,7 @@ const todoList = [
 
 const ulElement = document.querySelector('ul');
 
-for (let todo of todoList) {
+todoList.map(todo => {
   // Create the li element
   let liElement = document.createElement('li');
 
@@ -46,4 +46,4 @@ for (let todo of todoList) {
   liElement.appendChild(labelElement);
 
   ulElement.appendChild(liElement);
-}
+});

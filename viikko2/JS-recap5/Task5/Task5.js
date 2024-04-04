@@ -1,41 +1,122 @@
-async function fetchData(url = '', options = {}) {
-    const response = await fetch(url, options);
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-}
 
-async function fetchAndDisplayRestaurants() {
+const restaurants = [];
+
+const table = document.querySelector("table");
+const modal = document.getElementById("myModal");
+const span = document.getElementsByClassName("close")[0];
+
+async function getRestaurants() {
     try {
-        const url = 'https://your-schools-restaurant-api-endpoint';
-        const restaurants = await fetchData(url);
-        const tableElement = document.querySelector('table');
-        for (let restaurant of restaurants) {
-            const trElement = document.createElement('tr');
-            const nameTdElement = document.createElement('td');
-            nameTdElement.textContent = restaurant.name;
-            const addressTdElement = document.createElement('td');
-            addressTdElement.textContent = restaurant.address;
-            trElement.appendChild(nameTdElement);
-            trElement.appendChild(addressTdElement);
-            trElement.addEventListener('click', async () => {
-                const menuUrl = `https://your-schools-restaurant-api-endpoint/${restaurant.id}/menu`;
-                const menu = await fetchData(menuUrl);
-                const dialogElement = document.querySelector('dialog');
-                dialogElement.innerHTML = `
-          <h2>${restaurant.name}</h2>
-          <p>Address: ${restaurant.address}</p>
-          <h3>Menu</h3>
-          <ul>${menu.map(item => `<li>${item.name}: ${item.price}</li>`).join('')}</ul>
-        `;
-                dialogElement.showModal();
+        const response = await fetch(
+            "https://10.120.32.94/restaurant/api/v1/restaurants"
+        );
+        if (!response.ok) {
+            throw new Error("HTTP error, status = " + response.status);
+        } else {
+            const data = await response.json();
+            console.log(data);
+            data.forEach((restaurant) => {
+                restaurants.push(restaurant);
             });
-            tableElement.appendChild(trElement);
+            restaurants.sort((a, b) => {
+                return a.name.localeCompare(b.name);
+            });
+            createTable();
         }
     } catch (error) {
-        console.error('There has been a problem with your fetch operation: ', error);
+        console.log("Error: ", error);
     }
 }
 
-fetchAndDisplayRestaurants();
+async function getDailyMenu(id) {
+    try {
+        const response = await fetch(
+            `https://10.120.32.94/restaurant/api/v1/restaurants/daily/${id}/fi`
+        );
+        if (!response.ok) {
+            throw new Error(error);
+        } else {
+            const data = await response.json();
+            return data;
+        }
+    } catch (error) {
+        console.log("Error: ", error);
+    }
+}
+
+function createTable() {
+    restaurants.forEach((restaurant) => {
+        const row = document.createElement("tr");
+        const nameCell = document.createElement("td");
+
+        nameCell.textContent = restaurant.name;
+        row.appendChild(nameCell);
+
+        const addressCell = document.createElement("td");
+        addressCell.textContent = restaurant.address;
+
+        row.appendChild(addressCell);
+
+        row.addEventListener("click", () => {
+            document.querySelectorAll("tr").forEach((row) => {
+                row.classList.remove("highlight");
+            });
+            row.classList.add("highlight");
+            modal.style.display = "block";
+
+            const modalContent = document.querySelector(".modal-content");
+
+            while (modalContent.firstChild) {
+                modalContent.removeChild(modalContent.firstChild);
+            }
+
+            const restaurantName = document.createElement("h2");
+            restaurantName.textContent = restaurant.name;
+            const restaurantAddress = document.createElement("p");
+            restaurantAddress.textContent = restaurant.address;
+            const restaurantPostalCode = document.createElement("p");
+            restaurantPostalCode.textContent = restaurant.postalCode;
+            const restaurantCity = document.createElement("p");
+            restaurantCity.textContent = restaurant.city;
+            const restaurantPhone = document.createElement("p");
+            restaurantPhone.textContent = restaurant.phone;
+            const restaurantCompany = document.createElement("p");
+            restaurantCompany.textContent = restaurant.company;
+
+            modalContent.appendChild(restaurantName);
+            modalContent.appendChild(restaurantAddress);
+            modalContent.appendChild(restaurantPostalCode);
+            modalContent.appendChild(restaurantCity);
+            modalContent.appendChild(restaurantPhone);
+            modalContent.appendChild(restaurantCompany);
+
+            const courses = getDailyMenu(restaurant._id);
+            courses.then((data) => {
+                const menu = document.createElement("h3");
+                menu.textContent = "Menu";
+                modalContent.appendChild(menu);
+                console.log(data);
+                const courseList = document.createElement("ul");
+                data.courses.forEach((course) => {
+                    const courseName = document.createElement("li");
+                    courseName.textContent = course.name;
+                    courseList.appendChild(courseName);
+                    modalContent.appendChild(courseName);
+                });
+            });
+        });
+
+        table.appendChild(row);
+    });
+    span.onclick = function () {
+        modal.style.display = "none";
+    };
+
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    };
+}
+
+getRestaurants();

@@ -29,13 +29,12 @@ const todoList = [
 
 const ulElement = document.querySelector('ul');
 
-for (let todo of todoList) {
+todoList.map(todo => {
   let liElement = `
     <li>
       <input type="checkbox" id="todo-${todo.id}" ${todo.completed ? 'checked' : ''}>
       <label for="todo-${todo.id}">${todo.task}</label>
     </li>
   `;
-
   ulElement.insertAdjacentHTML('beforeend', liElement);
-}
+});

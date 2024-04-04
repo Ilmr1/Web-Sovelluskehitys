@@ -1,5 +1,5 @@
 
-const restaurants = [
+const restaurants= [
   {
     location: {type: 'Point', coordinates: [25.018456, 60.228982]},
     _id: '6470d38ecb12107db6fe24c1',
@@ -776,3 +776,8 @@ const map = L.map('map').setView([51.505, -0.09], 13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
+
+restaurants.forEach(restaurant => {
+  const coordinates = restaurant.location.coordinates;
+  L.marker([coordinates[1], coordinates[0]]).addTo(map);
+});
