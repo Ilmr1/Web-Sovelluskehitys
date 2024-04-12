@@ -1,5 +1,6 @@
 import  express from 'express';
 import api from './api/index.js';
+import catRouter from "./api/routes/cat-router.js";
 const app = express();
 
 app.use(express.json());
@@ -20,5 +21,5 @@ app.get('/api/v1/cat', (req, res) => {
     res.json(cat);
 });
 
-app.use('/api/v1', api);
+app.use('/', catRouter);
 export default app;

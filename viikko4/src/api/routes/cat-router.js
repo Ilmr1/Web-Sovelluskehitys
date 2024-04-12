@@ -1,16 +1,15 @@
 import express from 'express';
-import {
-    getCat,
-    getCatById,
-    postCat,
-    putCat,
-    deleteCat,
-} from '../controllers/cat-controller.js';
+import multer from 'multer';
+import { postCat } from '../controllers/cat-controller.js';
 
-const catRouter = express.Router();
+const router = express.Router();
 
-catRouter.route('/').get(getCat).post(postCat);
 
-catRouter.route('/:id').get(getCatById).put(putCat).delete(deleteCat);
 
-export default catRouter;
+const upload = multer({ dest: 'uploads/' })
+
+
+
+router.post('/',  upload.single('file'), postCat);
+
+export default router;
